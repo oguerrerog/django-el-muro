@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block titulo %}El Muro - Pagina Principal{% endblock %}
+
+{% block contenido %}
+
+<div class="row">
+    <h1>Bienvenid@: {{request.session.usuario.name}}</h1>
+    
+    <div class="col-md-8">
+        
+        {% for mensaje in mensajes reversed%}
+        <div class="card">
+            <div class="card-header">
+                El {{mensaje.created_at | date:"d M Y" }} se registro el siguiente mensaje:
+            </div>
+            <div class="card-body bg-secondary">
+                <blockquote class="blockquote text-center">
+                    <p class="mb-3 pl-3 text-white">
+                        "{{mensaje.mensaje}}"
+                        {% if request.session.usuario.id == mensaje.user.id %}
+                        <a alt="Eliminar Mensaje" href="/mensaje/{{mensaje.id}}/borrar">
+                            <i style="font-size: 1rem; color: yellow;" class="bi-trash"></i>
+                        </a>
+                        {% endif %}
+                    </p>
+                    <div class="blockquote-footer text-white-50">
+                        escrito por <cite>{{mensaje.user.name}}</cite>
+                    </div>
+                </blockquote>
+            </div>
+            <div class="card-footer">
+                <div class="container">
+                    <div class="container mt-3">
+                        <form action="/mensaje/comentario" method="post">
+                            {% csrf_token %}
+                            <div id="box2" class="tbox text-center">
+                                <div id="form_box ">
+                                    Ingresa tu comentario:
+                                    <input type="hidden" name="id_mensaje" value="{{mensaje.id}}">
+                                    <input type="text" class="tbox" id="comentario" name='comentario'>
+                                    <input type="button" class="btn btn-success btn-sm mb-1 " value="Agregar comentario" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="container mt-3">
+                        <p>Comentarios:</p>
+                        <hr>
+                        {% if mensaje.comentarios_mensaje.all %}
+                            {% for comentario in mensaje.comentarios_mensaje.all reversed%}
+                            
+                            <div class="row">
+                                <footer class="blockquote-footer">
+                                    {{comentario.created_at | date:"d/M/Y" }}, {{comentario.user.name}} dijo: <cite>{{comentario.comentario}}</cite>
+                                    {% if request.session.usuario.id == comentario.user.id %}
+                                    <a alt="Eliminar Comentario" href="/comentario/{{comentario.id}}/borrar">
+                                        <i style="font-size: 1rem; color: red;" class="bi-trash"></i>
+                                    </a>
+                                    {% endif %}
+                                </footer>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <li>No hay comentarios.</li>
+                        {% endif %}
+                        <hr>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <br>
+        {% endfor %}
+    
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header text-center">
+                ESCRIBE UN MENSAJE
+            </div>
+            <div class="card-body text-center">
+                <form action="/mensaje/crear" method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <input type="text" class="form-control" name='mensaje'>
+                    </div>
+                    <button type="submit" class="btn btn-success">Mandalo al Muro!</button>
+                </form>
+            </div>
+        </div>
+
+        
+    </div>
+</div>
+
+
+
+
+
+{% endblock %}
+
+{% block libreria %}
+{% endblock %}
